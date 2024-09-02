@@ -1,0 +1,51 @@
+services:
+  node-server:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./server/
+    restart: always
+    volumes:
+      - "./server/:/var/www/html/"
+    ports:
+      - "9000:9000"
+    links:
+      - postgres-db:postgres-db
+  react-client:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./client/
+    command: npm run dev
+    volumes:
+      - ./client/:/usr/app
+      - /usr/app/node_modules
+    depends_on:
+      - node-server
+    ports:
+      - "8080:8080"
+    links:
+      - node-server:node-server
+  postgres-db:
+    image: postgres
+    container_name: local_pgdb
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: MrJmaeff19!
+    volumes:
+      - local_pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8889:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: jordanjkroberts@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: MrJmaeff19!
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+volumes:
+  local_pgdata:
+  pgadmin-data:
