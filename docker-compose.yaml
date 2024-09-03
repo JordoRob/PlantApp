@@ -5,7 +5,7 @@ services:
       context: ./server/
     restart: always
     volumes:
-      - "./server/:/var/www/html/"
+      - "./server/:/server/"
     ports:
       - "9000:9000"
     links:
@@ -14,16 +14,20 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./client/
-    command: npm run dev
+    command: npm start
     volumes:
       - ./client/:/usr/app
       - /usr/app/node_modules
     depends_on:
       - node-server
     ports:
-      - "8080:8080"
+      - "3000:3000"
     links:
       - node-server:node-server
+    environment:
+      - WDS_SOCKET_HOST=127.0.0.1 
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true 
   postgres-db:
     image: postgres
     container_name: local_pgdb
